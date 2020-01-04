@@ -1,0 +1,20 @@
+name: StaffLog
+version: ${project.version}
+main: awakened.stafflog.StaffLog
+api-version: "1.13"
+prefix: StaffLog
+author: Awakened-Redstone
+database: true
+
+commands:
+  staff-mode:
+    permission: stafflog.commands.staff-mode
+    aliases:
+      - sm
+      - toggle-staff-mode
+      - tsm
+
+  staff-log:
+    permission: stafflog.admin
+    aliases:
+      - sl

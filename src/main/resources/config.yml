@@ -1,0 +1,21 @@
+stafflog:
+  database:
+    host: "localhost"
+    port: 3306
+    database: "staff-log"
+    username: "root"
+    password: "password"
+    main-table: "staff-data"
+    log-table: "command-log"
+
+  options:
+    database:
+      auto-create-database: false
+
+  messages:
+    send-no-args-error: false
+    errors:
+      not-a-user: "&cOnly players can run this command."
+      no-args: "&cPlease use a argument on the command."
+      invalid-arg: "&cPlease insert a valid argument."
+      no-permission: "&cYou can't use this command."
