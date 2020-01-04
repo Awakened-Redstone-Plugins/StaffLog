@@ -7,6 +7,7 @@ import awakened.stafflog.listeners.RegisterChatCommands;
 import awakened.stafflog.storage.Database;
 import awakened.stafflog.storage.DatabaseInitializer;
 import net.luckperms.api.LuckPerms;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
@@ -32,6 +33,7 @@ public final class StaffLog extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Metrics metrics = new Metrics(this);
         pluginManager = getServer().getPluginManager();
         loadConfig();
         startLuckPerms();
