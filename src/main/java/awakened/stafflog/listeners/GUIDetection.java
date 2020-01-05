@@ -50,6 +50,21 @@ public class GUIDetection implements Listener {
         return item;
     }
 
+    private ItemStack backHead2() {
+
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+
+        meta.setDisplayName("§cBack§r");
+
+        meta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("5ca62fac-d094-4346-8361-e1dfdd970607")));
+
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
     @EventHandler
     public void helpGUI(@NotNull InventoryClickEvent e) {
         Player player = Bukkit.getPlayer(e.getWhoClicked().getUniqueId());
@@ -87,20 +102,20 @@ public class GUIDetection implements Listener {
                 player.openInventory(playersInv(player));
                 player.sendMessage("§7§l[§3§lSL§7§l] §aDone.");
             }
-            if (material == Material.PLAYER_HEAD && e.getSlot() != 46 && e.getSlot() != 52 && e.getSlot() != 49) {
+            else if (material == Material.PLAYER_HEAD && e.getSlot() != 46 && e.getSlot() != 52 && e.getSlot() != 49) {
                 player.sendMessage("§7§l[§3§lSL§7§l] §aGetting log from database...");
                 player.openInventory(logInv(itemStack.getItemMeta().getDisplayName().replace("§b", ""), player));
                 player.sendMessage("§7§l[§3§lSL§7§l] §aDone.");
             }
-            if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().getDisplayName().equals("§aPrevious page")) {
+            else if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase("§aPrevious page")) {
                 pages.put(player, pages.get(player)-1);
                 e.getClickedInventory().setContents(playersInv(player).getContents());
             }
-            if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().getDisplayName().equals("§aNext page")) {
+            else if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase("§aNext page")) {
                 pages.put(player, pages.get(player)+1);
                 e.getClickedInventory().setContents(playersInv(player).getContents());
             }
-            if (e.getCurrentItem().equals(backHead())) {
+            else if (e.getCurrentItem().equals(backHead2())) {
                 player.openInventory(mainLogInv());
             }
         }
@@ -114,13 +129,13 @@ public class GUIDetection implements Listener {
             Material material = itemStack.getType();
             e.setCancelled(true);
 
-            if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().getDisplayName().equals("§aPrevious page")) {
+            if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase("§aPrevious page")) {
                 log_pages.put(player, log_pages.get(player)-1);
-                e.getClickedInventory().setContents(playersInv(player).getContents());
+                e.getClickedInventory().setContents(logInv(e.getInventory().getItem(11).getItemMeta().getDisplayName().replace("§a", "").replace("'s log", ""), player).getContents());
             }
-            if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().getDisplayName().equals("§aNext page")) {
+            if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase("§aNext page")) {
                 log_pages.put(player, log_pages.get(player)+1);
-                e.getClickedInventory().setContents(playersInv(player).getContents());
+                e.getClickedInventory().setContents(logInv(e.getInventory().getItem(11).getItemMeta().getDisplayName().replace("§a", "").replace("'s log", ""), player).getContents());
             }
             if (e.getCurrentItem().equals(backHead())) {
                 player.openInventory(playersInv(player));
@@ -183,6 +198,7 @@ public class GUIDetection implements Listener {
         return inventory;
     }
 
+    @NotNull
     private Inventory mainLogInv() {
         Inventory inventory = Bukkit.createInventory(null, 45, "§3Staff Log command log menu");
 
@@ -248,7 +264,7 @@ public class GUIDetection implements Listener {
         lore_setLevel.add("§7  /sl setLevel <player> <group>");
         lore_setLevel.add(" ");
         lore_setLevel.add("§7Aliases:");
-        lore_setLevel.add("/sl add <player> <group>");
+        lore_setLevel.add("&7  /sl add <player> <group>");
         setLevel_meta.setLore(lore_setLevel);
 
         remove_meta.setDisplayName("§bRemove");
@@ -434,6 +450,7 @@ public class GUIDetection implements Listener {
         lore_permissions.add("§b- stafflog.admin.commands.setlevel");
         lore_permissions.add("§b- stafflog.admin.commands.remove");
         lore_permissions.add("§b- stafflog.admin.commands.help");
+        lore_permissions.add("§b- stafflog.admin.commands.log");
         lore_permissions.add("§b- stafflog.commands.staff-mode");
         permissions_meta.setLore(lore_permissions);
 
@@ -515,30 +532,29 @@ public class GUIDetection implements Listener {
         items = staff.values().stream().sorted(Comparator.comparingInt(Staff::getWeight)).map(Staff::getItem).collect(Collectors.toList());
         Collections.reverse(items);
 
-        List<ItemStack> pageItems = items.stream().skip((pages.get(viewer)-1)*36).collect(Collectors.toList());
-        for(int i = 0; i < 36; i++) {
+        List<ItemStack> pageItems = items.stream().skip((pages.get(viewer)-1)*28).collect(Collectors.toList());
+        for(int i = 0; i < 28; i++) {
             if(pageItems.size() > i)
                 inventory.addItem(pageItems.get(i));
-            ;
         }
 
         boolean firstPage = pages.get(viewer) == 1;
-        boolean lastPage = pageItems.size() <= 36;
-        ItemStack nextPageItem = new ItemStack(firstPage?Material.PLAYER_HEAD:Material.PLAYER_HEAD);
-        SkullMeta nextPageItemMeta = (SkullMeta) nextPageItem.getItemMeta();
-        nextPageItemMeta.setDisplayName(firstPage?"§cYou're on the first page.":"§aPrevious page");
-        if (nextPageItem.getItemMeta().getDisplayName().equals("§aPrevious page")) {
-            nextPageItemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("e8627b92-1dcb-4733-810c-a2b47833c451")));
+        boolean lastPage = pageItems.size() <= 28;
+        ItemStack firstPageItem = new ItemStack(firstPage?Material.PLAYER_HEAD:Material.PLAYER_HEAD);
+        SkullMeta firstPageItemMeta = (SkullMeta) firstPageItem.getItemMeta();
+        firstPageItemMeta.setDisplayName(firstPage?"§cYou're on the first page.":"§aPrevious page");
+        if (!firstPage) {
+            firstPageItemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("e8627b92-1dcb-4733-810c-a2b47833c451")));
         } else {
-            nextPageItemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("03d2d48e-5d26-4460-8eaf-26b434b3f349")));
+            firstPageItemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("03d2d48e-5d26-4460-8eaf-26b434b3f349")));
         }
 
-        nextPageItem.setItemMeta(nextPageItemMeta);
+        firstPageItem.setItemMeta(firstPageItemMeta);
 
         ItemStack lastPageItem = new ItemStack(lastPage?Material.PLAYER_HEAD:Material.PLAYER_HEAD);
         SkullMeta lastPageItemMeta = (SkullMeta) lastPageItem.getItemMeta();
         lastPageItemMeta.setDisplayName(lastPage?"§cYou're on the last page.":"§aNext page");
-        if (lastPageItem.getItemMeta().getDisplayName().equals("§aNext page")) {
+        if (!lastPage) {
             lastPageItemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("74d11297-0fd9-4d43-91d9-8e5216a63efa")));
         } else {
             lastPageItemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("03d2d48e-5d26-4460-8eaf-26b434b3f349")));
@@ -546,8 +562,8 @@ public class GUIDetection implements Listener {
 
         lastPageItem.setItemMeta(lastPageItemMeta);
 
-        inventory.setItem(49, backHead());
-        inventory.setItem(46, nextPageItem);
+        inventory.setItem(49, backHead2());
+        inventory.setItem(46, firstPageItem);
         inventory.setItem(52, lastPageItem);
 
         for (int i = 0; i < inventory.getSize(); i++) {
@@ -599,9 +615,9 @@ public class GUIDetection implements Listener {
         for (int i = 0; i < maxSize; i++)
             items.add(new ItemStack(Material.PAPER));
 
-        List<ItemStack> pageItems = items.stream().skip((log_pages.get(viewer) - 1) * 36).collect(Collectors.toList());
-        int lores = 1;
-        for (int i = 0; i < 34; i++) {
+        List<ItemStack> pageItems = items.stream().skip((log_pages.get(viewer) - 1) * 28).collect(Collectors.toList());
+        int lores = 1 + ((log_pages.get(viewer) -1) * 28);
+        for (int i = 0; i < 28; i++) {
             if (pageItems.size() > i) {
                 List<String> logItems = logs.stream().skip((lores - 1) * 10).collect(Collectors.toList());
                 for (int l = 0; l < 10; l++) {
@@ -624,27 +640,27 @@ public class GUIDetection implements Listener {
         }
 
         boolean firstPage = log_pages.get(viewer) == 1;
-        boolean lastPage = pageItems.size() <= 36;
-        ItemStack nextPageItem = new ItemStack(firstPage ? Material.PLAYER_HEAD : Material.PLAYER_HEAD);
-        ItemMeta nextPageItemMeta = nextPageItem.getItemMeta();
-        nextPageItemMeta.setDisplayName(firstPage ? "§cYou're on the first page." : "§aPrevious page");
-        nextPageItem.setItemMeta(nextPageItemMeta);
-        if (nextPageItem.getItemMeta().getDisplayName().equals("§aPrevious page")) {
-            SkullMeta head_meta = (SkullMeta) nextPageItemMeta;
+        boolean lastPage = pageItems.size() <= 28;
+        ItemStack firstPageItem = new ItemStack(firstPage ? Material.PLAYER_HEAD : Material.PLAYER_HEAD);
+        ItemMeta firstPageItemMeta = firstPageItem.getItemMeta();
+        firstPageItemMeta.setDisplayName(firstPage ? "§cYou're on the first page." : "§aPrevious page");
+        firstPageItem.setItemMeta(firstPageItemMeta);
+        if (!firstPage) {
+            SkullMeta head_meta = (SkullMeta) firstPageItemMeta;
             head_meta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("e8627b92-1dcb-4733-810c-a2b47833c451")));
-            nextPageItemMeta = head_meta;
+            firstPageItemMeta = head_meta;
         } else {
-            SkullMeta head_meta = (SkullMeta) nextPageItemMeta;
+            SkullMeta head_meta = (SkullMeta) firstPageItemMeta;
             head_meta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("03d2d48e-5d26-4460-8eaf-26b434b3f349")));
-            nextPageItemMeta = head_meta;
+            firstPageItemMeta = head_meta;
         }
 
-        nextPageItem.setItemMeta(nextPageItemMeta);
+        firstPageItem.setItemMeta(firstPageItemMeta);
 
         ItemStack lastPageItem = new ItemStack(lastPage ? Material.PLAYER_HEAD : Material.PLAYER_HEAD);
         ItemMeta lastPageItemMeta = lastPageItem.getItemMeta();
-        lastPageItemMeta.setDisplayName(lastPage ? "§cYou're on the last page." : "§aNext Page");
-        if (lastPageItem.getItemMeta().getDisplayName().equals("§aNext page")) {
+        lastPageItemMeta.setDisplayName(lastPage ? "§cYou're on the last page." : "§aNext page");
+        if (!lastPage) {
             SkullMeta head_meta = (SkullMeta) lastPageItemMeta;
             head_meta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString("74d11297-0fd9-4d43-91d9-8e5216a63efa")));
             lastPageItemMeta = head_meta;
@@ -657,7 +673,7 @@ public class GUIDetection implements Listener {
         lastPageItem.setItemMeta(lastPageItemMeta);
 
         inventory.setItem(49, backHead());
-        inventory.setItem(46, nextPageItem);
+        inventory.setItem(46, firstPageItem);
         inventory.setItem(52, lastPageItem);
 
         for (int i = 0; i < inventory.getSize(); i++) {
