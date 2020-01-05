@@ -612,6 +612,7 @@ public class GUIDetection implements Listener {
         double size = logs.size();
         double maxSize = size/10;
         maxSize = Math.ceil(maxSize);
+
         for (int i = 0; i < maxSize; i++)
             items.add(new ItemStack(Material.PAPER));
 
