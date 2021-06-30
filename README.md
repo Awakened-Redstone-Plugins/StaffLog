@@ -1,3 +1,5 @@
+This project won't be updated anymore. No support will be given
+
 # StaffLog
 StaffLog is  plugin that allows server owners to administrate their staff with the command `/staff-log log` that allow them to look all the command their staff ran and tried to run.
 It also allows staff to play normally with the command `/staff-mode` that switches between staff and non-staff.
